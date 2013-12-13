@@ -5,7 +5,7 @@ value pheight = 300;  // Height of drawing area in pixels
 value gwidth = 124;   // Number of cells horizontally and vertically
 value gheight = 60;   // Number of cells horizontally and vertically
 
-abstract class State() of alive | resurrected | moribund | dead {}
+abstract class State(){}
 object alive extends State() {}
 object resurrected extends State() {}
 object moribund extends State() {}
@@ -121,7 +121,7 @@ class Grid(width, height) {
     }
     
     // Create the grid
-    value cells = array{for(y in 0:height) for(x in 0:width) Cell(x, y)};
+    value cells = Array{for(y in 0:height) for(x in 0:width) Cell(x, y)};
     
     Cell cell(Integer x, Integer y) {
         value c = cells[(y + height) % height * width + (x + width) % width];
@@ -231,18 +231,19 @@ void drawCells({Cell*} cells, void drawCell(Cell c)) {
     }
 }
 
+
 void draw() {
     value newXdead = life.evolve();
-    value new = newXdead[0];
+    value newv = newXdead[0];
     value dead = newXdead[1];
     count++;
     value runtime = (getTime() - start);
     value fps = count.float / (runtime.float / 1000.0);
     if (prevCount >= 0 && count % 100 == 0) {
-        print("draw (new=``new.size``, dead=``dead.size``, count=``count``, fps=``fps``)");
+        print("draw (new=``newv.size``, dead=``dead.size``, count=``count``, fps=``fps``)");
     }
     
-    if (prevCount >= 0 && prevNew == new.size && prevDead == dead.size) {
+    if (prevCount >= 0 && prevNew == newv.size && prevDead == dead.size) {
         if (prevCount > 10) {
             print("Stable state, loop detected");
             print("Drawn ``count`` frames in ``runtime/1000`` seconds (fps=``fps``)");
@@ -251,7 +252,7 @@ void draw() {
             prevCount++;
         }
     } else {
-        prevNew = new.size;
+        prevNew = newv.size;
         prevDead = dead.size;
     }
     dynamic {
@@ -268,10 +269,10 @@ void draw() {
                 ctx.fillRect(c.x * cwidth, c.y * cheight, cwidth, cheight);
             }
             
-            drawCells(new, drawCell);
+            drawCells(newv, drawCell);
             drawCells(dead, drawCell);
       
-            if (!new.empty || !dead.empty) {
+            if (!newv.empty || !dead.empty) {
                 setTimeout(draw, 1);
             } else {
                 print("Stable state, stopped");
